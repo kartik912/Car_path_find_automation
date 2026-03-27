@@ -6,10 +6,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="debug" style="position:absolute; left:6px; top:6px; color:white; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:4px; z-index:1000; font-family: Arial, sans-serif; font-size:12px">Status: init</div>
     <canvas id="carCanvas"></canvas>
     <div id="verticalButtons">
         <button onclick="save()">💾</button>
         <button onclick="discard()">🗑️</button>
+        <div id="stats" style="color:white; padding:6px; font-size:14px;">Generation: 0</div>
     </div>
     <canvas id="networkCanvas"></canvas>
     <script src="network.js"></script>

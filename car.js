@@ -48,6 +48,8 @@ class Car {
         }
 
         this.controls = new Controls(controlType);
+        // track if the car is tailing/following traffic for prolonged time
+        this.followingTicks = 0;
     }
 
     update(roadBorders, traffic) {
@@ -69,6 +71,53 @@ class Car {
                 this.controls.left = outputs[1];
                 this.controls.right = outputs[2];
                 this.controls.reverse = outputs[3];
+            }
+
+            // Detect if the car is closely following traffic in the center rays.
+            // Used to penalize "following" behavior that exploits a lead vehicle.
+            const centerIndex = Math.floor(this.sensor.rayCount / 2);
+            const closeTrafficDetected = this.sensor.readings.some((r, idx) => {
+                if (!r || !r.object) return false;
+                if (Math.abs(idx - centerIndex) > 1) return false; // prefer central rays
+                // small offset means the object is very close ahead on the ray
+                return r.offset < 0.12 && r.object.y < this.y;
+            });
+
+            if (closeTrafficDetected) {
+                this.followingTicks++;
+            } else {
+                this.followingTicks = Math.max(0, this.followingTicks - 1);
+            }
+
+            // If the car has been following for too long, force a crash into the leading traffic
+            const FOLLOW_LIMIT = (typeof FOLLOW_TICK_LIMIT !== 'undefined') ? FOLLOW_TICK_LIMIT : 30;
+            if (this.useBrain && this.followingTicks > FOLLOW_LIMIT) {
+                // find the nearest traffic object among central rays
+                let leading = null;
+                let minOff = Infinity;
+                const centerIndex = Math.floor(this.sensor.rayCount / 2);
+                for (let i = 0; i < this.sensor.readings.length; i++) {
+                    const r = this.sensor.readings[i];
+                    if (!r || !r.object) continue;
+                    if (Math.abs(i - centerIndex) > 1) continue;
+                    if (r.object.y < this.y && r.offset < minOff) {
+                        minOff = r.offset;
+                        leading = r.object;
+                    }
+                }
+
+                // If very close to the front object, push into it to guarantee collision
+                if (leading && minOff < 0.15) {
+                    const overlap = 5; // pixels to overlap to ensure intersect
+                    this.y = leading.y + (leading.height + this.height) / 2 - overlap;
+                    this.speed = 0;
+                    this.controls.forward = false;
+                    this.controls.left = false;
+                    this.controls.right = false;
+                    this.controls.reverse = false;
+                    this.damage = true; // mark as crashed
+                    console.log('🚨 Forced crash: AI car flagged as damaged for persistent following.');
+                }
             }
         }
     }

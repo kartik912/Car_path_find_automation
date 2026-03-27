@@ -47,6 +47,8 @@ class Sensor {
                     poly[(j+1)%poly.length],
                 );
                 if (value) {
+                    // attach reference to the traffic object that produced this intersection
+                    value.object = traffic[i];
                     touches.push(value);
                 }
             }
