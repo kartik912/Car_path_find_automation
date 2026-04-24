@@ -9,6 +9,10 @@
 
 **An interactive self-driving car simulation built entirely with vanilla JavaScript, showcasing intelligent pathfinding and collision detection using ray-casting sensors.**
 
+**
+A really fun project to learn about game physics, sensor-based navigation, and autonomous vehicle concepts without any external libraries or frameworks.
+**
+
 [🎮 Try Demo](https://kartik912.github.io/Car_path_find_automation/) • [📖 Documentation](#-project-overview) • [🤝 Contributing](CONTRIBUTING.md) • [📄 License](LICENSE)
 
 </div>
