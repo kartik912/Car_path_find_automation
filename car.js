@@ -52,11 +52,22 @@ class Car {
         this.followingTicks = 0;
     }
 
-    update(roadBorders, traffic) {
+    update(roadBorders, traffic, trafficLights = []) {
         if (!this.damage) {
             this.#move();
             this.polygon = this.#createPolygon();
             this.damage = this.#assessDamage(roadBorders, traffic);
+        }
+
+        // Check traffic lights and apply braking if needed
+        let shouldStop = false;
+        if (trafficLights.length > 0) {
+            for (let light of trafficLights) {
+                if (light.shouldStop(this.y, 80)) {
+                    shouldStop = true;
+                    break;
+                }
+            }
         }
 
         if (this.sensor) {
@@ -71,6 +82,18 @@ class Car {
                 this.controls.left = outputs[1];
                 this.controls.right = outputs[2];
                 this.controls.reverse = outputs[3];
+
+                // Force stop if traffic light is red
+                if (shouldStop) {
+                    this.controls.forward = 0;
+                    this.controls.reverse = 0.5; // Gentle braking
+                }
+            } else {
+                // For dummy cars, apply traffic light rules
+                if (shouldStop) {
+                    this.controls.forward = 0;
+                    this.controls.reverse = 0.3;
+                }
             }
 
             // Detect if the car is closely following traffic in the center rays.

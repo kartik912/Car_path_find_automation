@@ -120,11 +120,14 @@ function animate(){
         carCanvas.height = window.innerHeight;
         networkCanvas.height = window.innerHeight;
 
+        // Update traffic lights
+        road.updateTrafficLights();
+
         for(let i=0; i<traffic.length; i++){
             traffic[i].update(road.borders, []);
         }
         for(let i=0; i<cars.length; i++){
-            cars[i].update(road.borders, traffic);
+            cars[i].update(road.borders, traffic, road.trafficLights);
         }
 
     // choose the best car excluding ones that are clearly following traffic
