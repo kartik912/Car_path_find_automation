@@ -20,6 +20,30 @@ class Road{
             [topLeft, bottomLeft],
             [topRight, bottomRight]
         ];
+
+        // Initialize traffic lights at specific intervals
+        this.trafficLights = [];
+        this.createTrafficLights();
+    }
+
+    createTrafficLights() {
+        const lightSpacing = 600; // Distance between traffic lights
+        for (let yPos = 0; yPos < 3000; yPos += lightSpacing) {
+            for (let laneIndex = 0; laneIndex < this.laneCount; laneIndex++) {
+                const light = new TrafficLight(
+                    this.getLaneCenter(laneIndex),
+                    yPos,
+                    laneIndex,
+                    this.width,
+                    this.laneCount
+                );
+                this.trafficLights.push(light);
+            }
+        }
+    }
+
+    updateTrafficLights() {
+        this.trafficLights.forEach(light => light.update());
     }
 
     getLaneCenter(laneIndex){
@@ -52,5 +76,7 @@ class Road{
             ctx.lineTo(border[1].x, border[1].y);
             ctx.stroke();
         });
+
+        // Draw traffic lights
+        this.trafficLights.forEach(light => light.draw(ctx));
     }
-}

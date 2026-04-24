@@ -37,7 +37,6 @@ function polysIntersect(poly1, poly2){
     }
     return false;
 }
-@sdfjskldjfalksjf
 
 function getRGBA(value){
     const alpha=Math.abs(value);
